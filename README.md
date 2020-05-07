@@ -1,16 +1,21 @@
 # dbt-migrations
 A dbt plugin to support database migrations.
 
+## Background
+
 *In feedback phase, very unstable!*
 
 This plugin introduces the concept of database migrations, which on the surface is counter to the dbt "everything is a select statement" mantra.
 
 It's important to note that this plugin is specifically *not* for creating tables, views or any other type of relation. Instead, it is to manage the many other types of objects present in modern analytics databases (stages, file formats, pipes, tasks, streams, etc).
 
+Currently, ensuring the migrations run in order is a little tricky, and it's necessary to create model dependancies by convention (just an incrementing number). [In future](https://github.com/fishtown-analytics/dbt/issues/1212) it maybe be possible to support nicely named migration files with semantic versioning in their names.,
 
-Currently, ensuring the migrations run in order is a little tricky, and it's necessary to create model dependancies by convention (just an incrementing number). (In future)[https://github.com/fishtown-analytics/dbt/issues/1212] it maybe be possible to support nicely named migration files with semantic versioning in their names.,
+## How it works
 
-
+This plugin includes:
+1) A new materialization named "migration" which runs the model SQL verbatim, but only if it hasn't been ran before. It creates and maintains a table named "change_history" under a custom schema named "migrations" to achieve this.
+2) A macro named "enfore_migration_dependancy" which, when added to a model, ensures it depends on another model whose name is (numerically) one less than itself. This ensures that migrations are ran in the correct order.
 
 ## Usage instructions
 
